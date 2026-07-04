@@ -14,19 +14,46 @@ function App() {
     setLoading(true);
     setError(null);
     try {
-      // Usaremos la funcion de netlify en produccion. En dev, puede que necesitemos usar un prefijo si usamos netlify dev.
-      // Pero como estamos construyendo esto para netlify, llamaremos directamente a la ruta.
-      const response = await fetch('/.netlify/functions/getRiverData');
+      // Usamos corsproxy.io para saltar las restricciones de CORS en el navegador.
+      // Así evitamos usar el backend de Netlify que está bloqueado por el firewall de Prefectura.
+      const url = 'https://corsproxy.io/?url=https://contenidosweb.prefecturanaval.gob.ar/alturas/?page=historico&tiempo=7&id=532';
+      
+      const response = await fetch(url, {
+        headers: {
+          'Accept': 'text/html,application/xhtml+xml,application/xml'
+        }
+      });
       
       if (!response.ok) {
         throw new Error('Error al obtener datos reales. Usando datos de prueba.');
       }
       
-      const result = await response.json();
-      setData(result);
+      const html = await response.text();
+      
+      const currentMatch = html.match(/ltimo registro: <\/b>([0-9.]+) Mts el (.*?) - ([0-9]+)/);
+      const previousMatch = html.match(/Registro anterior: <\/b>([0-9.]+) Mts el (.*?) - ([0-9]+)/);
+
+      if (!currentMatch || !previousMatch) {
+        throw new Error('No se pudo parsear el HTML devuelto por Prefectura.');
+      }
+      
+      setData({
+        current: {
+          height: currentMatch[1],
+          date: currentMatch[2],
+          time: currentMatch[3]
+        },
+        previous: {
+          height: previousMatch[1],
+          date: previousMatch[2],
+          time: previousMatch[3]
+        },
+        fetchedAt: new Date().toISOString(),
+        isFallbackData: false
+      });
     } catch (err) {
       console.warn(err);
-      // Fallback para desarrollo local donde no corre la función Netlify
+      // Fallback para desarrollo o cuando falla la web
       setData({
         current: { height: '8.95', date: '04/JUL/26', time: '0800' },
         previous: { height: '9.30', date: '03/JUL/26', time: '1800' },
