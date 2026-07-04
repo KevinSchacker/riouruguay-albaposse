@@ -1,29 +1,25 @@
+/* ============================================
+   FLYER WRAPPER — Formato fijo estado WhatsApp
+   ============================================ */
 .flyer-wrapper {
   width: 500px !important;
   min-width: 500px !important;
   max-width: 500px !important;
-  height: 888px !important; /* Exact 9:16 ratio for WhatsApp Status (500 * 16/9) */
-  background-color: #002855; /* Azul oscuro institucional */
+  height: 888px !important;
+  background-color: #002855;
   color: white;
   font-family: 'Montserrat', sans-serif;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-  border-radius: 8px; /* Opcional, pero queda bien en preview */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
 }
 
-/* Permitir que el contenedor de los datos ocupe el resto del espacio y se distribuya bonito */
-.flyer-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around; /* Distribuye el espacio verticalmente */
-  padding-bottom: 20px;
-}
-
-/* FALLBACK BANNER */
+/* ============================================
+   FALLBACK BANNER
+   ============================================ */
 .fallback-banner {
   background-color: #d90429;
   color: white;
@@ -37,29 +33,40 @@
   border-bottom: 2px solid #fff;
 }
 
-/* HEADER */
+/* ============================================
+   HEADER — Fondo gradiente con logos y titulos
+   ============================================ */
 .flyer-header {
-  position: relative;
-  background-color: #001a36; /* Azul bien oscuro de fondo principal */
-  z-index: 2;
-  padding-bottom: 20px;
+  position: absolute; /* Flota sobre la imagen */
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(180deg, #0d52a8 0%, rgba(1, 48, 115, 0.85) 65%, transparent 100%);
+  z-index: 10;
+  padding: 12px 5px 4px 5px; /* Más espacio abajo para el fundido */
+  box-sizing: border-box;
 }
+
+
 
 .header-content {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px 0 20px;
+  align-items: center; /* Centrado automático perfecto de flexbox */
+  width: 100%;
   position: relative;
   z-index: 10;
 }
 
+/* Logos */
 .logo-container {
-  width: 80px;
-  height: 80px;
+  width: 100px;
+  height: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  overflow: visible; /* IMPORTANTE: visible para no recortar los logos */
 }
 
 .header-logo {
@@ -68,82 +75,77 @@
   object-fit: contain;
 }
 
-/* Clases específicas por si se necesita ajustar cada logo individualmente */
-.logo-left {
-  /* sin estilos extras, imagen transparente original */
+.left-logo {
+  margin-left: 8px;
 }
 
-.logo-right {
-  /* scale reseteado porque la imagen ya no tiene fondo */
+.right-logo {
+  margin-right: 5px; /* Empuja el escudo derecho un poco a la izquierda para que no toque el borde */
 }
-
+/* Titles */
 .header-titles {
   text-align: center;
   flex: 1;
-  padding: 0 10px;
+  padding: 10px 8px; /* Sin padding arriba, flexbox lo centra solo */
 }
 
 .header-titles h2 {
-  margin: 0;
-  font-size: 18px;
+  margin: 0 0 2px 0;
+  font-size: 16px;
   font-weight: 700;
-  color: #fff;
-  letter-spacing: 2px;
+  color: #cce8ff;
+  letter-spacing: 3px;
+  text-transform: uppercase;
 }
 
 .header-titles h1 {
   margin: 0;
-  font-size: 40px;
+  font-size: 30px; /* Reducido de 36px para que no desborde el ancho y empuje el logo */
   font-weight: 900;
-  color: #bdfa29; /* Verde lima brillante */
-  text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
-  letter-spacing: 0.5px;
+  color: #bdfa29;
+  text-shadow: 0 0 20px rgba(189, 250, 41, 0.4), 2px 2px 6px rgba(0, 0, 0, 0.9);
+  letter-spacing: 1px;
   white-space: nowrap;
-  transform: scaleY(1.3); /* Hace la letra más alta como en el original */
-  margin-top: 5px;
-  margin-bottom: 5px;
+  line-height: 1;
 }
 
-/* WAVES & LOCATION BADGE */
+/* Location Badge */
 .location-badge {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: max-content;
   margin: 15px auto 0 auto;
-  background-color: #0077b6;
-  padding: 4px 15px;
-  border-radius: 20px;
-  font-weight: bold;
-  font-size: 16px;
+  background: linear-gradient(90deg, #0077b6, #0096c7);
+  padding: 6px 18px;
+  border-radius: 50px;
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 1px;
   color: #ffffff;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-  position: relative;
-  z-index: 15;
-}
-
-.wave-divider-top {
-  position: absolute;
-  bottom: -40px; /* Sale del header hacia la imagen */
-  left: 0;
-  width: 100%;
-  height: 50px;
-  z-index: 5;
-}
-
-.divider-svg {
-  display: block;
-  width: 100%;
-  height: 100%;
+  box-shadow: 0 4px 12px rgba(0, 119, 182, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
 /* CENTRAL IMAGE */
 .flyer-image-container {
-  height: 270px;
+  height: 430px; /* Cubre el area del header + la foto */
+  flex-shrink: 0;
   position: relative;
-  background-color: #0077b6;
+  background-color: #013073;
   overflow: hidden;
-  z-index: 1;
+  z-index: 1; /* Va por debajo del header */
+}
+
+/* Suaviza el corte recto inferior fundiéndolo con el azul marino de los datos */
+.flyer-image-container::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 70px;
+  background: linear-gradient(to top, #01285e 0%, transparent 100%);
+  pointer-events: none;
 }
 
 .image-background {
@@ -151,69 +153,78 @@
   height: 100%;
   background-image: url('/puerto-bg.jpg');
   background-size: cover;
-  background-position: center bottom;
+  background-position: center 54%;
   background-repeat: no-repeat;
-  filter: brightness(0.9);
+  filter: brightness(0.95);
 }
 
+/* SVG Separator — Ola de abajo de la foto */
+.photo-wave-separator {
+  display: block;
+  width: 100%;
+  line-height: 0;
+  position: relative;
+  z-index: 3;
+  margin-top: -1px;
+}
 
+.photo-wave-separator svg {
+  display: block;
+  width: 100%;
+  height: 45px;
+}
 
-/* DATA SECTION */
+/* ============================================
+   DATA SECTION
+   ============================================ */
 .flyer-data-section {
-  flex: 1; /* Ocupa el espacio vertical restante */
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 15px; /* Espacio entre las tarjetas y el cartel de la balsa */
-  padding: 30px 20px 20px 20px;
+  gap: 14px;
+  padding: 15px 20px 15px 20px;
   position: relative;
   z-index: 3;
-  background-color: #001a36; /* Mismo azul que el header */
-}
-
-.wave-divider-bottom {
-  position: absolute;
-  top: -39px; /* Sale de la caja de datos hacia arriba, superponiendo la foto */
-  left: 0;
-  width: 100%;
-  height: 40px;
-  z-index: 5;
+  background: linear-gradient(180deg, #01285e 0%, #001535 100%);
 }
 
 .data-cards-container {
   display: flex;
-  gap: 15px;
-  /* margin-bottom eliminado ya que flex gap se encarga del espaciado */
+  gap: 12px;
 }
 
 .data-card {
   flex: 1;
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255, 255, 255, 0.06);
   border-radius: 12px;
-  padding: 15px 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .previous-card {
-  border: 1px solid #0077b6;
+  border-color: rgba(0, 180, 216, 0.5);
+  background: rgba(0, 40, 90, 0.5);
 }
 
 .current-card {
-  border: 1px solid #2b9348;
+  border-color: rgba(56, 176, 0, 0.5);
+  background: rgba(20, 80, 30, 0.5);
 }
 
 .card-header {
   display: flex;
   align-items: center;
-  padding: 12px;
-  background-color: rgba(0,0,0,0.1);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding: 10px 12px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   justify-content: flex-start;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .calendar-icon {
@@ -222,6 +233,7 @@
   margin-right: 8px;
   display: flex;
   color: #90e0ef;
+  flex-shrink: 0;
 }
 
 .current-card .calendar-icon {
@@ -235,24 +247,25 @@
 }
 
 .subtitle {
-  font-size: 10.5px;
-  color: #e0e0e0;
-  font-weight: 500;
-  letter-spacing: 0.2px;
+  font-size: 9px;
+  color: #b0c4de;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
 .date-text {
-  font-size: 14px;
+  font-size: 13px;
   color: white;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0;
   white-space: nowrap;
 }
 
 .height-value {
   text-align: center;
-  padding: 5px 0;
+  padding: 8px 0 0 0;
   flex: 1;
   display: flex;
   align-items: baseline;
@@ -260,67 +273,69 @@
 }
 
 .height-value .number {
-  font-size: 65px;
-  font-weight: 600;
-  color: #ffd166; /* Amarillo */
+  font-size: 62px;
+  font-weight: 700;
+  color: #ffd166;
   line-height: 1;
-  text-shadow: none;
+  text-shadow: 0 0 15px rgba(255, 209, 102, 0.3);
 }
 
 .current-card .height-value .number {
-  color: #bdfa29; /* Verde lima brillante */
+  color: #bdfa29;
+  text-shadow: 0 0 15px rgba(189, 250, 41, 0.3);
 }
 
 .height-value .unit {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 600;
-  margin-left: 5px;
-  opacity: 1;
+  margin-left: 4px;
+  opacity: 0.9;
   color: white;
 }
 
 .trend-status {
   text-align: center;
-  padding: 0 0 15px 0;
-  font-weight: 600;
-  font-size: 16px;
+  padding: 4px 0 12px 0;
+  font-weight: 700;
+  font-size: 14px;
   letter-spacing: 0.5px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   background-color: transparent;
   text-transform: uppercase;
 }
 
 .trend-status.neutral {
-  color: white;
+  color: rgba(255, 255, 255, 0.7);
 }
 
-/* ALERT BOX */
+/* ============================================
+   FERRY STATUS ALERT
+   ============================================ */
 .ferry-status-alert {
-  background: linear-gradient(90deg, #a81c1c, #c92424, #a81c1c);
-  border-radius: 8px;
-  padding: 15px 15px; /* Ligeramente más alto para mejor presencia visual */
+  background: linear-gradient(90deg, #8b0000, #c0392b, #8b0000);
+  border-radius: 10px;
+  padding: 14px 15px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  margin-top: 15px;
-  border: 1px solid #e63946;
+  gap: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(231, 76, 60, 0.6);
 }
 
 .ferry-status-alert.operational {
-  background: linear-gradient(90deg, #2b9348, #38b000, #2b9348);
-  border-color: #38b000;
-  box-shadow: 0 4px 15px rgba(43, 147, 72, 0.4);
+  background: linear-gradient(90deg, #145a32, #27ae60, #145a32);
+  border-color: rgba(39, 174, 96, 0.6);
+  box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .alert-icon-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 15px;
   flex-shrink: 0;
 }
 
@@ -328,37 +343,41 @@
   display: flex;
   flex-direction: column;
   text-align: center;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .alert-subtitle {
-  font-size: 13px;
-  font-weight: 500;
-  color: white;
-  letter-spacing: 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  letter-spacing: 0.5px;
 }
 
 .alert-title {
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 26px;
+  font-weight: 900;
   text-transform: uppercase;
-  color: #ffc300; /* Amarillo */
-  text-shadow: none;
-  margin: -2px 0;
+  color: #ffc300;
+  text-shadow: 0 0 10px rgba(255, 195, 0, 0.4);
+  margin: 0;
+  letter-spacing: 1px;
 }
 
-/* FOOTER */
+/* ============================================
+   FOOTER
+   ============================================ */
 .flyer-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  background-color: #001d3d;
-  border-top: 1px solid rgba(255,255,255,0.1);
-  margin-top: auto; /* Empuja el footer siempre hacia el fondo */
+  padding: 14px 20px;
+  background: linear-gradient(90deg, #00101f, #001d3d, #00101f);
+  border-top: 2px solid rgba(0, 119, 182, 0.4);
+  margin-top: auto;
 }
 
-.footer-info, .footer-logo {
+.footer-info,
+.footer-logo {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -368,21 +387,25 @@
   display: flex;
   flex-direction: column;
   font-size: 9px;
-  color: #adb5bd;
+  color: #90aecb;
+  line-height: 1.4;
 }
 
 .info-text span:first-child {
-  font-weight: bold;
+  font-weight: 800;
   font-size: 11px;
+  color: #cce8ff;
 }
 
 /* TIMESTAMP FINAL */
 .timestamp-final {
   text-align: center;
-  font-size: 14px;
-  color: #ffffff;
-  padding-bottom: 20px;
-  background-color: #001d3d;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 8px 0 12px 0;
+  background: linear-gradient(90deg, #00101f, #001d3d, #00101f);
+  letter-spacing: 0.5px;
 }
 
 .right-align {
