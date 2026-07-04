@@ -167,6 +167,30 @@ function App() {
             )}
           </div>
 
+          {/* Estado de Conexión */}
+          <div className="connection-status" style={{
+            margin: '15px 0', 
+            padding: '10px', 
+            borderRadius: '6px', 
+            fontSize: '13px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '8px',
+            backgroundColor: loading ? '#e9ecef' : (error ? '#f8d7da' : '#d4edda'),
+            color: loading ? '#495057' : (error ? '#721c24' : '#155724'),
+            border: `1px solid ${loading ? '#ced4da' : (error ? '#f5c6cb' : '#c3e6cb')}`
+          }}>
+            <div style={{
+              width: '10px', 
+              height: '10px', 
+              borderRadius: '50%', 
+              backgroundColor: loading ? '#adb5bd' : (error ? '#dc3545' : '#28a745')
+            }}></div>
+            <strong>Estado:</strong> 
+            {loading ? 'Obteniendo datos de Prefectura...' : 
+              (error ? 'NO se pudo obtener la info de Prefectura.' : 'Información obtenida correctamente.')}
+          </div>
+
           <div className="actions">
             {!manualMode && (
               <button onClick={fetchData} disabled={loading} className="btn btn-secondary">
@@ -180,8 +204,6 @@ function App() {
               Descargar Flyer
             </button>
           </div>
-
-          {error && !manualMode && <div className="error-message">{error}</div>}
         </div>
 
         <div className="preview-panel">
