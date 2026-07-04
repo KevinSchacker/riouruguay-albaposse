@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Anchor, Info, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Calendar, Anchor, Info, TrendingUp, TrendingDown, Minus, MapPin } from 'lucide-react';
 import './FlyerPreview.css'; // Estilos específicos para el flyer
 
 const FlyerPreview = ({ data, ferryOperational }) => {
@@ -54,8 +54,10 @@ const FlyerPreview = ({ data, ferryOperational }) => {
           <h2>ESTADO ACTUAL DEL</h2>
           <h1>RÍO URUGUAY</h1>
           <div className="location-badge">
-            <span className="location-icon">📍</span>
-            <span>PUERTO ALBA POSSE</span>
+            <span className="location-icon" style={{display: 'flex', alignItems: 'center'}}>
+              <MapPin size={16} color="#ffffff" fill="#e63946" />
+            </span>
+            <span style={{marginLeft: '4px'}}>PUERTO ALBA POSSE</span>
           </div>
         </div>
         <div className="logo-container right-logo">
