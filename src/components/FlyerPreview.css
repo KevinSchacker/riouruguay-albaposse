@@ -111,7 +111,8 @@
 
 /* Location Badge */
 .location-badge {
-  display: inline-flex;
+  display: flex;
+  width: max-content;
   align-items: center;
   justify-content: center;
   margin: 15px auto 0 auto;
@@ -122,7 +123,7 @@
   font-size: 14px;
   letter-spacing: 1px;
   color: #ffffff;
-  box-shadow: 0 4px 12px rgba(0, 119, 182, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 119, 182, 0.6); /* Sin inset para evitar bug de html2canvas */
   border: 1px solid rgba(255, 255, 255, 0.25);
 }
 
@@ -322,14 +323,14 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4); /* Sin inset shadow por bug de html2canvas */
   border: 1px solid rgba(231, 76, 60, 0.6);
 }
 
 .ferry-status-alert.operational {
   background: linear-gradient(90deg, #145a32, #27ae60, #145a32);
   border-color: rgba(39, 174, 96, 0.6);
-  box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3); /* Sin inset shadow por bug de html2canvas */
 }
 
 .alert-icon-container {
