@@ -111,7 +111,7 @@
 
 /* CENTRAL IMAGE */
 .flyer-image-container {
-  height: 200px;
+  height: 260px; /* Aumentado para rellenar mejor el formato 9:16 */
   position: relative;
   background-color: #0077b6;
   overflow: hidden;
@@ -151,6 +151,11 @@
 
 /* DATA SECTION */
 .flyer-data-section {
+  flex: 1; /* Ocupa el espacio vertical restante */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px; /* Espacio entre las tarjetas y el cartel de la balsa */
   padding: 20px;
   padding-top: 30px;
   position: relative;
@@ -160,7 +165,7 @@
 .data-cards-container {
   display: flex;
   gap: 15px;
-  margin-bottom: 20px;
+  /* margin-bottom eliminado ya que flex gap se encarga del espaciado */
 }
 
 .data-card {
@@ -277,7 +282,7 @@
 .ferry-status-alert {
   background: linear-gradient(90deg, #a81c1c, #c92424, #a81c1c);
   border-radius: 8px;
-  padding: 10px 15px;
+  padding: 15px 15px; /* Ligeramente más alto para mejor presencia visual */
   display: flex;
   align-items: center;
   justify-content: center;
