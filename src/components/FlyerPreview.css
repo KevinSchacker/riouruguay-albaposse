@@ -93,6 +93,8 @@
   text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
   letter-spacing: 0.5px;
   white-space: nowrap;
+}
+
 /* WAVES & LOCATION BADGE */
 .wave-container-top {
   position: relative;
