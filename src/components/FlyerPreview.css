@@ -39,13 +39,19 @@
 
 /* HEADER */
 .flyer-header {
+  position: relative;
+  background-color: #001a36; /* Azul bien oscuro de fondo principal */
+  z-index: 2;
+  padding-bottom: 20px;
+}
+
+.header-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
-  background: linear-gradient(180deg, rgba(0,25,60,1) 0%, rgba(0,40,85,1) 100%);
+  padding: 15px 20px 0 20px;
   position: relative;
-  z-index: 2;
+  z-index: 10;
 }
 
 .logo-container {
@@ -79,7 +85,7 @@
 
 .header-titles h2 {
   margin: 0;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
   color: #fff;
   letter-spacing: 2px;
@@ -87,60 +93,57 @@
 
 .header-titles h1 {
   margin: 0;
-  font-size: 38px;
-  font-weight: 800;
+  font-size: 40px;
+  font-weight: 900;
   color: #bdfa29; /* Verde lima brillante */
   text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
   letter-spacing: 0.5px;
   white-space: nowrap;
+  transform: scaleY(1.3); /* Hace la letra más alta como en el original */
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 /* WAVES & LOCATION BADGE */
-.wave-container-top {
+.location-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  margin: 15px auto 0 auto;
+  background-color: #0077b6;
+  padding: 4px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 16px;
+  color: #ffffff;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
   position: relative;
+  z-index: 15;
+}
+
+.wave-divider-top {
+  position: absolute;
+  bottom: -40px; /* Sale del header hacia la imagen */
+  left: 0;
   width: 100%;
-  height: 90px;
-  margin-top: -10px; /* Sube la ola para fundirse con el header */
-  background-color: transparent;
+  height: 50px;
   z-index: 5;
 }
 
-.wave-svg {
-  position: absolute;
-  top: 0;
-  left: 0;
+.divider-svg {
+  display: block;
   width: 100%;
   height: 100%;
 }
 
-.wave-cyan {
-  z-index: 1;
-  top: 15px; /* Baja la ola celeste para que se vea el borde inferior por debajo de la oscura */
-}
-
-.wave-dark {
-  z-index: 2;
-  top: 0;
-}
-
-.location-badge-wave {
-  position: absolute;
-  top: 35px; /* Centrado en la ola celeste */
-  left: 0;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 3;
-}
-
 /* CENTRAL IMAGE */
 .flyer-image-container {
-  height: 240px; /* Ajustado por la altura de las olas */
+  height: 270px;
   position: relative;
   background-color: #0077b6;
   overflow: hidden;
-  margin-top: -40px; /* Sube la imagen para que quede bajo las olas del top */
+  z-index: 1;
 }
 
 .image-background {
@@ -153,15 +156,6 @@
   filter: brightness(0.9);
 }
 
-.wave-container-bottom {
-  position: absolute;
-  bottom: -2px; /* Evita línea fina por subpixel rendering */
-  left: 0;
-  width: 100%;
-  height: 60px;
-  z-index: 3;
-}
-
 
 
 /* DATA SECTION */
@@ -170,11 +164,20 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 10px; /* Espacio entre las tarjetas y el cartel de la balsa */
-  padding: 20px;
-  padding-top: 30px;
+  gap: 15px; /* Espacio entre las tarjetas y el cartel de la balsa */
+  padding: 30px 20px 20px 20px;
   position: relative;
   z-index: 3;
+  background-color: #001a36; /* Mismo azul que el header */
+}
+
+.wave-divider-bottom {
+  position: absolute;
+  top: -39px; /* Sale de la caja de datos hacia arriba, superponiendo la foto */
+  left: 0;
+  width: 100%;
+  height: 40px;
+  z-index: 5;
 }
 
 .data-cards-container {

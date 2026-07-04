@@ -47,50 +47,48 @@ const FlyerPreview = ({ data, ferryOperational }) => {
 
       {/* HEADER */}
         <header className="flyer-header">
-          <div className="logo-container left-logo">
-            <img src="/logo-proteccion-final.png" alt="Protección Civil Alba Posse" className="header-logo logo-left" />
+          <div className="header-content">
+            <div className="logo-container left-logo">
+              <img src="/logo-proteccion-final.png" alt="Protección Civil Alba Posse" className="header-logo logo-left" />
+            </div>
+            <div className="header-titles">
+              <h2>ESTADO ACTUAL DEL</h2>
+              <h1>RÍO URUGUAY</h1>
+              
+              <div className="location-badge">
+                <MapPin size={16} color="#ffffff" fill="#e63946" style={{marginRight: '6px', flexShrink: 0}} />
+                <span>PUERTO ALBA POSSE</span>
+              </div>
+            </div>
+            <div className="logo-container right-logo">
+              <img src="/logo-municipio-final.png" alt="Municipio Alba Posse" className="header-logo logo-right" />
+            </div>
           </div>
-          <div className="header-titles">
-            <h2>ESTADO ACTUAL DEL</h2>
-            <h1>RÍO URUGUAY</h1>
-          </div>
-          <div className="logo-container right-logo">
-            <img src="/logo-municipio-final.png" alt="Municipio Alba Posse" className="header-logo logo-right" />
+          
+          {/* Top Wave Divider */}
+          <div className="wave-divider-top">
+            <svg viewBox="0 0 500 50" preserveAspectRatio="none" className="divider-svg">
+              <path d="M0,0 C150,60 300,10 500,50 L500,0 L0,0 Z" fill="#0077b6" />
+              <path d="M0,0 C150,30 350,60 500,10 L500,0 L0,0 Z" fill="#001a36" />
+            </svg>
           </div>
         </header>
-
-        {/* Olas Top y Location Badge (Capa superpuesta al borde del header/imagen) */}
-        <div className="wave-container-top">
-          {/* Ola base cyan */}
-          <svg viewBox="0 0 500 80" className="wave-svg wave-cyan" preserveAspectRatio="none">
-            <path d="M0,0 C150,60 350,0 500,40 L500,0 L0,0 Z" fill="#0077b6" />
-          </svg>
-          {/* Ola superpuesta azul oscuro */}
-          <svg viewBox="0 0 500 80" className="wave-svg wave-dark" preserveAspectRatio="none">
-            <path d="M0,0 C150,40 300,70 500,10 L500,0 L0,0 Z" fill="#002855" />
-          </svg>
-          
-          <div className="location-badge-wave">
-            <MapPin size={16} color="#ffffff" fill="#e63946" style={{marginRight: '6px', flexShrink: 0}} />
-            <span style={{color: '#ffffff', fontWeight: 'bold', textShadow: '1px 1px 3px rgba(0,0,0,0.5)'}}>PUERTO ALBA POSSE</span>
-          </div>
-        </div>
 
         {/* CENTRAL IMAGE */}
         <div className="flyer-image-container">
           <div className="image-background"></div>
-          
-          {/* Ola inferior que separa la imagen de los datos */}
-          <div className="wave-container-bottom">
-            <svg viewBox="0 0 500 60" className="wave-svg" preserveAspectRatio="none">
-              <path d="M0,60 C150,0 350,60 500,10 L500,60 L0,60 Z" fill="#002855" />
+        </div>
+        
+        {/* DATA SECTION WITH BOTTOM WAVE */}
+        <div className="flyer-data-section">
+          {/* Bottom Wave Divider */}
+          <div className="wave-divider-bottom">
+            <svg viewBox="0 0 500 40" preserveAspectRatio="none" className="divider-svg">
+              <path d="M0,40 C200,0 350,60 500,10 L500,40 L0,40 Z" fill="#001a36" />
             </svg>
           </div>
-        </div>
-
-      {/* DATA CARDS */}
-      <div className="flyer-data-section">
-        <div className="data-cards-container">
+          
+          <div className="data-cards-container">
           
           {/* LECTURA ANTERIOR */}
           <div className="data-card previous-card">
