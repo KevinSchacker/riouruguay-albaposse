@@ -41,10 +41,16 @@
   top: 0;
   left: 0;
   width: 100%;
-  background: linear-gradient(180deg, #0d52a8 0%, rgba(1, 48, 115, 0.85) 65%, rgba(1, 48, 115, 0) 100%);
+  height: 430px; /* Cubre toda la foto para esconder el bounding box de html2canvas */
+  pointer-events: none; /* No bloquear clics */
+  background: linear-gradient(180deg, #0d52a8 0%, rgba(1, 48, 115, 0.85) 17%, rgba(1, 48, 115, 0) 27%);
   z-index: 10;
-  padding: 12px 5px 4px 5px; /* Más espacio abajo para el fundido */
+  padding: 12px 5px 0 5px;
   box-sizing: border-box;
+}
+
+.flyer-header * {
+  pointer-events: auto; /* Restaurar clics a los hijos */
 }
 
 
@@ -407,6 +413,9 @@
   padding: 8px 0 12px 0;
   background: linear-gradient(90deg, #00101f, #001d3d, #00101f);
   letter-spacing: 0.5px;
+  margin-top: -1px; /* Solapar 1px para tapar el hueco subpíxel azul de html2canvas */
+  position: relative;
+  z-index: 2;
 }
 
 .right-align {
