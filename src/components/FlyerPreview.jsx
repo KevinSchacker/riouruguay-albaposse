@@ -54,10 +54,8 @@ const FlyerPreview = ({ data, ferryOperational }) => {
           <h2>ESTADO ACTUAL DEL</h2>
           <h1>RÍO URUGUAY</h1>
           <div className="location-badge">
-            <span className="location-icon" style={{display: 'flex', alignItems: 'center'}}>
-              <MapPin size={16} color="#ffffff" fill="#e63946" />
-            </span>
-            <span style={{marginLeft: '4px'}}>PUERTO ALBA POSSE</span>
+            <MapPin size={16} color="#ffffff" fill="#e63946" style={{marginRight: '6px', flexShrink: 0}} />
+            <span style={{color: '#ffffff', fontWeight: 'bold'}}>PUERTO ALBA POSSE</span>
           </div>
         </div>
         <div className="logo-container right-logo">
