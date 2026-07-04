@@ -8,14 +8,23 @@ function App() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [ferryOperational, setFerryOperational] = useState(false); // default to false as in the example
+  const [ferryOperational, setFerryOperational] = useState(false);
+  const [manualMode, setManualMode] = useState(false);
+  
+  // Estados para modo manual
+  const [manualData, setManualData] = useState({
+    currentHeight: '8.50',
+    currentDate: '04/JUL/26',
+    currentTime: '1200',
+    prevHeight: '9.00',
+    prevDate: '04/JUL/26',
+    prevTime: '0600'
+  });
 
   const fetchData = async () => {
     setLoading(true);
     setError(null);
     try {
-      // Usamos corsproxy.io para saltar las restricciones de CORS en el navegador.
-      // Así evitamos usar el backend de Netlify que está bloqueado por el firewall de Prefectura.
       const url = 'https://corsproxy.io/?url=https://contenidosweb.prefecturanaval.gob.ar/alturas/?page=historico&tiempo=7&id=532';
       
       const response = await fetch(url, {
@@ -25,7 +34,7 @@ function App() {
       });
       
       if (!response.ok) {
-        throw new Error('Error al obtener datos reales. Usando datos de prueba.');
+        throw new Error('Error de conexión.');
       }
       
       const html = await response.text();
@@ -34,7 +43,7 @@ function App() {
       const previousMatch = html.match(/Registro anterior: <\/b>([0-9.]+) Mts el (.*?) - ([0-9]+)/);
 
       if (!currentMatch || !previousMatch) {
-        throw new Error('No se pudo parsear el HTML devuelto por Prefectura.');
+        throw new Error('No se pudo leer el formato.');
       }
       
       setData({
@@ -53,14 +62,8 @@ function App() {
       });
     } catch (err) {
       console.warn(err);
-      // Fallback para desarrollo o cuando falla la web
-      setData({
-        current: { height: '8.95', date: '04/JUL/26', time: '0800' },
-        previous: { height: '9.30', date: '03/JUL/26', time: '1800' },
-        fetchedAt: new Date().toISOString(),
-        isFallbackData: true
-      });
-      setError('Aviso: Mostrando datos de prueba porque no se pudo conectar con Prefectura.');
+      setError('El servidor de Prefectura bloqueó la conexión automática.');
+      setManualMode(true); // Activar modo manual automáticamente si falla
     } finally {
       setLoading(false);
     }
@@ -75,24 +78,30 @@ function App() {
     if (!flyerElement) return;
 
     try {
-      // Ocultar botones o cosas que no queremos en el canvas (si las hubiera dentro del componente)
       const canvas = await html2canvas(flyerElement, {
-        scale: 2, // Mejor resolución
+        scale: 2,
         useCORS: true,
-        backgroundColor: '#002855' // Color de fondo base por las dudas
+        backgroundColor: '#002855'
       });
       
       const image = canvas.toDataURL('image/png');
       const link = document.createElement('a');
       link.href = image;
-      const dateStr = new Date().toISOString().split('T')[0];
-      link.download = `estado-rio-uruguay-${dateStr}.png`;
+      link.download = `estado-rio-uruguay-${new Date().getTime()}.png`;
       link.click();
     } catch (err) {
-      console.error('Error al generar la imagen', err);
+      console.error('Error al generar imagen:', err);
       alert('Hubo un error al generar la imagen.');
     }
   };
+
+  // Determinar qué datos enviar al flyer
+  const flyerData = manualMode ? {
+    current: { height: manualData.currentHeight, date: manualData.currentDate, time: manualData.currentTime },
+    previous: { height: manualData.prevHeight, date: manualData.prevDate, time: manualData.prevTime },
+    fetchedAt: new Date().toISOString(),
+    isFallbackData: false
+  } : data;
 
   return (
     <div className="app-container">
@@ -103,49 +112,84 @@ function App() {
 
       <main className="app-main">
         <div className="controls-panel">
+          
           <div className="control-group">
             <h3>Estado de las Balsas</h3>
             <div className="toggle-container">
               <label className="switch">
                 <input 
                   type="checkbox" 
-                  checked={ferryOperational} 
-                  onChange={(e) => setFerryOperational(e.target.checked)} 
+                  checked={ferryOperational}
+                  onChange={(e) => setFerryOperational(e.target.checked)}
                 />
                 <span className="slider round"></span>
               </label>
               <span className="toggle-label">
-                {ferryOperational ? 'Operativas (Servicio Normal)' : 'Sin Operatividad (Suspendido)'}
+                {ferryOperational ? 'Operativo (Habilitado)' : 'Sin Operatividad (Suspendido)'}
               </span>
             </div>
           </div>
 
-          <div className="actions">
-            <button onClick={fetchData} disabled={loading} className="btn btn-secondary">
-              <RefreshCw size={18} className={loading ? 'spin' : ''} />
-              {loading ? 'Actualizando...' : 'Actualizar Datos'}
-            </button>
+          <div className="control-group" style={{marginTop: '20px', borderTop: '1px solid #ddd', paddingTop: '20px'}}>
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px'}}>
+              <h3 style={{margin: 0}}>Ingreso Manual</h3>
+              <label className="switch">
+                <input 
+                  type="checkbox" 
+                  checked={manualMode}
+                  onChange={(e) => setManualMode(e.target.checked)}
+                />
+                <span className="slider round"></span>
+              </label>
+            </div>
             
-            <button onClick={handleDownload} disabled={loading || !data || error} className="btn btn-primary">
+            {manualMode && (
+              <div className="manual-inputs" style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
+                <div style={{background: '#f8f9fa', padding: '15px', borderRadius: '8px'}}>
+                  <h4 style={{margin: '0 0 10px 0', color: '#002855'}}>Último Registro (Actual)</h4>
+                  <input type="text" placeholder="Altura (ej: 8.50)" value={manualData.currentHeight} onChange={e => setManualData({...manualData, currentHeight: e.target.value})} style={{width: '100%', padding: '8px', marginBottom: '8px'}} />
+                  <div style={{display: 'flex', gap: '8px'}}>
+                    <input type="text" placeholder="Día/Mes (ej: 04/JUL)" value={manualData.currentDate} onChange={e => setManualData({...manualData, currentDate: e.target.value})} style={{width: '50%', padding: '8px'}} />
+                    <input type="text" placeholder="Hora (ej: 1200)" value={manualData.currentTime} onChange={e => setManualData({...manualData, currentTime: e.target.value})} style={{width: '50%', padding: '8px'}} />
+                  </div>
+                </div>
+
+                <div style={{background: '#f8f9fa', padding: '15px', borderRadius: '8px'}}>
+                  <h4 style={{margin: '0 0 10px 0', color: '#002855'}}>Registro Anterior</h4>
+                  <input type="text" placeholder="Altura (ej: 9.00)" value={manualData.prevHeight} onChange={e => setManualData({...manualData, prevHeight: e.target.value})} style={{width: '100%', padding: '8px', marginBottom: '8px'}} />
+                  <div style={{display: 'flex', gap: '8px'}}>
+                    <input type="text" placeholder="Día/Mes (ej: 04/JUL)" value={manualData.prevDate} onChange={e => setManualData({...manualData, prevDate: e.target.value})} style={{width: '50%', padding: '8px'}} />
+                    <input type="text" placeholder="Hora (ej: 0600)" value={manualData.prevTime} onChange={e => setManualData({...manualData, prevTime: e.target.value})} style={{width: '50%', padding: '8px'}} />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="actions">
+            {!manualMode && (
+              <button onClick={fetchData} disabled={loading} className="btn btn-secondary">
+                <RefreshCw size={18} className={loading ? 'spin' : ''} />
+                {loading ? 'Actualizando...' : 'Auto-Actualizar'}
+              </button>
+            )}
+            
+            <button onClick={handleDownload} disabled={loading || (!data && !manualMode) || (error && !manualMode)} className="btn btn-primary">
               <Download size={18} />
               Descargar Flyer
             </button>
           </div>
 
-          {error && <div className="error-message">{error}</div>}
-          
-          <div className="last-sync">
-            {data && <p>Última vez leída la info: {new Date(data.fetchedAt).toLocaleString()}</p>}
-          </div>
+          {error && !manualMode && <div className="error-message">{error}</div>}
         </div>
 
         <div className="preview-panel">
           <h2>Vista Previa del Flyer</h2>
           <div className="preview-container">
-            {loading && !data ? (
+            {loading && !data && !manualMode ? (
               <div className="loading-state">Cargando datos del río...</div>
             ) : (
-              <FlyerPreview data={data} ferryOperational={ferryOperational} />
+              <FlyerPreview data={flyerData} ferryOperational={ferryOperational} />
             )}
           </div>
         </div>
