@@ -49,8 +49,8 @@
 }
 
 .logo-container {
-  width: 95px;
-  height: 95px;
+  width: 80px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -79,16 +79,16 @@
 
 .header-titles h2 {
   margin: 0;
-  font-size: 15px;
-  font-weight: 500;
+  font-size: 16px;
+  font-weight: 700;
   color: #fff;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
 }
 
 .header-titles h1 {
   margin: 0;
-  font-size: 34px;
-  font-weight: 700;
+  font-size: 38px;
+  font-weight: 800;
   color: #bdfa29; /* Verde lima brillante */
   text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
   letter-spacing: 0.5px;
@@ -99,15 +99,15 @@
 .wave-container-top {
   position: relative;
   width: 100%;
-  height: 60px;
-  margin-top: -1px;
+  height: 90px;
+  margin-top: -10px; /* Sube la ola para fundirse con el header */
   background-color: transparent;
   z-index: 5;
 }
 
 .wave-svg {
   position: absolute;
-  bottom: 0;
+  top: 0;
   left: 0;
   width: 100%;
   height: 100%;
@@ -115,17 +115,17 @@
 
 .wave-cyan {
   z-index: 1;
+  top: 15px; /* Baja la ola celeste para que se vea el borde inferior por debajo de la oscura */
 }
 
 .wave-dark {
   z-index: 2;
-  height: 80%;
-  bottom: 20%;
+  top: 0;
 }
 
 .location-badge-wave {
   position: absolute;
-  top: 5px;
+  top: 35px; /* Centrado en la ola celeste */
   left: 0;
   width: 100%;
   display: flex;
@@ -155,10 +155,10 @@
 
 .wave-container-bottom {
   position: absolute;
-  bottom: 0;
+  bottom: -2px; /* Evita línea fina por subpixel rendering */
   left: 0;
   width: 100%;
-  height: 40px;
+  height: 60px;
   z-index: 3;
 }
 
