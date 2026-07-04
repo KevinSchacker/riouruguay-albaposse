@@ -46,30 +46,47 @@ const FlyerPreview = ({ data, ferryOperational }) => {
       )}
 
       {/* HEADER */}
-      <header className="flyer-header">
-        <div className="logo-container left-logo">
-          <img src="/logo-proteccion-final.png" alt="Protección Civil Alba Posse" className="header-logo logo-left" />
-        </div>
-        <div className="header-titles">
-          <h2>ESTADO ACTUAL DEL</h2>
-          <h1>RÍO URUGUAY</h1>
-          <div className="location-badge">
+        <header className="flyer-header">
+          <div className="logo-container left-logo">
+            <img src="/logo-proteccion-final.png" alt="Protección Civil Alba Posse" className="header-logo logo-left" />
+          </div>
+          <div className="header-titles">
+            <h2>ESTADO ACTUAL DEL</h2>
+            <h1>RÍO URUGUAY</h1>
+          </div>
+          <div className="logo-container right-logo">
+            <img src="/logo-municipio-final.png" alt="Municipio Alba Posse" className="header-logo logo-right" />
+          </div>
+        </header>
+
+        {/* Olas Top y Location Badge (Capa superpuesta al borde del header/imagen) */}
+        <div className="wave-container-top">
+          {/* Ola base cyan */}
+          <svg viewBox="0 0 500 80" className="wave-svg wave-cyan" preserveAspectRatio="none">
+            <path d="M0,0 C150,60 350,0 500,40 L500,0 L0,0 Z" fill="#0077b6" />
+          </svg>
+          {/* Ola superpuesta azul oscuro */}
+          <svg viewBox="0 0 500 80" className="wave-svg wave-dark" preserveAspectRatio="none">
+            <path d="M0,0 C150,40 300,70 500,10 L500,0 L0,0 Z" fill="#002855" />
+          </svg>
+          
+          <div className="location-badge-wave">
             <MapPin size={16} color="#ffffff" fill="#e63946" style={{marginRight: '6px', flexShrink: 0}} />
-            <span style={{color: '#ffffff', fontWeight: 'bold'}}>PUERTO ALBA POSSE</span>
+            <span style={{color: '#ffffff', fontWeight: 'bold', textShadow: '1px 1px 3px rgba(0,0,0,0.5)'}}>PUERTO ALBA POSSE</span>
           </div>
         </div>
-        <div className="logo-container right-logo">
-          <img src="/logo-municipio-final.png" alt="Municipio Alba Posse" className="header-logo logo-right" />
-        </div>
-      </header>
 
-      {/* CENTRAL IMAGE */}
-      <div className="flyer-image-container">
-        <div className="image-background"></div>
-        {/* Curvas decorativas con CSS puro */}
-        <div className="curve-top"></div>
-        <div className="curve-bottom"></div>
-      </div>
+        {/* CENTRAL IMAGE */}
+        <div className="flyer-image-container">
+          <div className="image-background"></div>
+          
+          {/* Ola inferior que separa la imagen de los datos */}
+          <div className="wave-container-bottom">
+            <svg viewBox="0 0 500 60" className="wave-svg" preserveAspectRatio="none">
+              <path d="M0,60 C150,0 350,60 500,10 L500,60 L0,60 Z" fill="#002855" />
+            </svg>
+          </div>
+        </div>
 
       {/* DATA CARDS */}
       <div className="flyer-data-section">
@@ -174,6 +191,11 @@ const FlyerPreview = ({ data, ferryOperational }) => {
           </div>
         </div>
       </footer>
+
+      {/* TIMESTAMP FINAL */}
+      <div className="timestamp-final">
+        Actualización {safeData.current.time} hs. Día {safeData.current.date}/26
+      </div>
     </div>
   );
 };
