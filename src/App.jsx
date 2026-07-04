@@ -25,7 +25,8 @@ function App() {
     setLoading(true);
     setError(null);
     try {
-      const url = 'https://corsproxy.io/?url=https://contenidosweb.prefecturanaval.gob.ar/alturas/?page=historico&tiempo=7&id=532';
+      // proxy.cors.sh comprobó poder saltar el agresivo firewall de Prefectura
+      const url = 'https://proxy.cors.sh/https://contenidosweb.prefecturanaval.gob.ar/alturas/?page=historico&tiempo=7&id=532';
       
       const response = await fetch(url, {
         headers: {
