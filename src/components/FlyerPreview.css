@@ -90,6 +90,7 @@
   margin-top: 5px;
   font-weight: bold;
   font-size: 14px;
+  color: #ffffff;
 }
 
 .location-badge .location-icon {
@@ -274,7 +275,8 @@
 }
 
 .ferry-status-alert.operational {
-  background-color: #2b9348;
+  background: linear-gradient(90deg, #2b9348, #38b000, #2b9348);
+  border-color: #38b000;
   box-shadow: 0 4px 15px rgba(43, 147, 72, 0.4);
 }
 
