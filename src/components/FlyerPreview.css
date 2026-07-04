@@ -1,0 +1,344 @@
+.flyer-wrapper {
+  width: 500px;
+  background-color: #002855; /* Azul oscuro institucional */
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  border-radius: 8px; /* Opcional, pero queda bien en preview */
+}
+
+/* FALLBACK BANNER */
+.fallback-banner {
+  background-color: #d90429;
+  color: white;
+  text-align: center;
+  padding: 8px;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  position: relative;
+  z-index: 10;
+  border-bottom: 2px solid #fff;
+}
+
+/* HEADER */
+.flyer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(0,25,60,1) 0%, rgba(0,40,85,1) 100%);
+  position: relative;
+  z-index: 2;
+}
+
+.logo-container {
+  width: 95px;
+  height: 95px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Clases específicas por si se necesita ajustar cada logo individualmente */
+.logo-left {
+  /* sin estilos extras, imagen transparente original */
+}
+
+.logo-right {
+  /* scale reseteado porque la imagen ya no tiene fondo */
+}
+
+.header-titles {
+  text-align: center;
+  flex: 1;
+  padding: 0 10px;
+}
+
+.header-titles h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  color: #fff;
+  letter-spacing: 1px;
+}
+
+.header-titles h1 {
+  margin: 0;
+  font-size: 34px;
+  font-weight: 700;
+  color: #bdfa29; /* Verde lima brillante */
+  text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.location-badge {
+  display: inline-flex;
+  align-items: center;
+  background-color: #0077b6;
+  padding: 4px 12px;
+  border-radius: 20px;
+  margin-top: 5px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.location-badge .location-icon {
+  margin-right: 5px;
+}
+
+/* CENTRAL IMAGE */
+.flyer-image-container {
+  height: 200px;
+  position: relative;
+  background-color: #0077b6;
+  overflow: hidden;
+}
+
+.image-background {
+  width: 100%;
+  height: 100%;
+  background-image: url('/puerto-bg.jpg');
+  background-size: cover;
+  background-position: center bottom; /* Ajusta la imagen al fondo, subiendo el bote lo máximo posible */
+  background-repeat: no-repeat;
+  filter: brightness(0.9); /* Opcional: para que no brille tanto y pegue más con el azul oscuro */
+}
+
+.curve-top {
+  position: absolute;
+  top: -10px;
+  left: -10%;
+  width: 120%;
+  height: 30px;
+  background-color: #002855;
+  border-radius: 50%;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.3);
+}
+
+.curve-bottom {
+  position: absolute;
+  bottom: -15px;
+  left: -10%;
+  width: 120%;
+  height: 40px;
+  background-color: #002855;
+  border-radius: 50%;
+  z-index: 2;
+}
+
+/* DATA SECTION */
+.flyer-data-section {
+  padding: 20px;
+  padding-top: 30px;
+  position: relative;
+  z-index: 3;
+}
+
+.data-cards-container {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.data-card {
+  flex: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+  display: flex;
+  flex-direction: column;
+}
+
+.previous-card {
+  background: linear-gradient(145deg, rgba(0,119,182,0.1), rgba(0,40,85,0.4));
+  background-color: #002855;
+  border: 1px solid rgba(0,119,182,0.6);
+}
+
+.current-card {
+  background: linear-gradient(145deg, #246e34, #1b4d25);
+  border: 1px solid #369c4a;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  background-color: rgba(0,0,0,0.1);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  justify-content: flex-start;
+}
+
+.calendar-icon {
+  background-color: transparent;
+  padding: 0;
+  margin-right: 8px;
+  display: flex;
+  color: #90e0ef;
+}
+
+.current-card .calendar-icon {
+  color: #bdfa29;
+}
+
+.header-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.subtitle {
+  font-size: 10.5px;
+  color: #e0e0e0;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+.date-text {
+  font-size: 14px;
+  color: white;
+  font-weight: 600;
+  letter-spacing: 0;
+  white-space: nowrap;
+}
+
+.height-value {
+  text-align: center;
+  padding: 5px 0;
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+}
+
+.height-value .number {
+  font-size: 65px;
+  font-weight: 600;
+  color: #ffd166; /* Amarillo */
+  line-height: 1;
+  text-shadow: none;
+}
+
+.current-card .height-value .number {
+  color: #bdfa29; /* Verde lima brillante */
+}
+
+.height-value .unit {
+  font-size: 22px;
+  font-weight: 600;
+  margin-left: 5px;
+  opacity: 1;
+  color: white;
+}
+
+.trend-status {
+  text-align: center;
+  padding: 0 0 15px 0;
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: transparent;
+  text-transform: uppercase;
+}
+
+.trend-status.neutral {
+  color: white;
+}
+
+/* ALERT BOX */
+.ferry-status-alert {
+  background: linear-gradient(90deg, #a81c1c, #c92424, #a81c1c);
+  border-radius: 8px;
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  margin-top: 15px;
+  border: 1px solid #e63946;
+}
+
+.ferry-status-alert.operational {
+  background-color: #2b9348;
+  box-shadow: 0 4px 15px rgba(43, 147, 72, 0.4);
+}
+
+.alert-icon-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.alert-text {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.alert-subtitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: white;
+  letter-spacing: 0;
+}
+
+.alert-title {
+  font-size: 24px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #ffc300; /* Amarillo */
+  text-shadow: none;
+  margin: -2px 0;
+}
+
+/* FOOTER */
+.flyer-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #001d3d;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.footer-info, .footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.info-text {
+  display: flex;
+  flex-direction: column;
+  font-size: 9px;
+  color: #adb5bd;
+}
+
+.info-text span:first-child {
+  color: white;
+  font-weight: bold;
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+.right-align {
+  text-align: right;
+}

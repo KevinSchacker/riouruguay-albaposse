@@ -1,0 +1,336 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&display=swap');
+
+:root {
+  font-family: 'Oswald', sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #f8f9fa; /* Color claro para la app */
+  color: #212529;
+}
+
+#root {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.app-header {
+  text-align: center;
+}
+
+.app-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 5px;
+  color: #002855;
+}
+
+.app-header p {
+  font-size: 1.2rem;
+  color: #6c757d;
+  margin-top: 0;
+}
+
+.app-main {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.controls-panel {
+  flex: 1;
+  min-width: 300px;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.preview-panel {
+  flex: 2;
+  min-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.preview-panel h2 {
+  color: #002855;
+  margin-top: 0;
+}
+
+.preview-container {
+  border: 1px dashed #ced4da;
+  padding: 20px;
+  border-radius: 12px;
+  background: #e9ecef;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.loading-state {
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
+  font-weight: bold;
+}
+
+.control-group {
+  margin-bottom: 30px;
+}
+
+.control-group h3 {
+  margin-top: 0;
+  color: #343a40;
+}
+
+.actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 16px;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: #0077b6;
+  color: white;
+  flex: 2;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: #023e8a;
+}
+
+.btn-secondary {
+  background-color: #e9ecef;
+  color: #495057;
+  flex: 1;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: #dee2e6;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.error-message {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #f8d7da;
+  color: #721c24;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.last-sync {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: #6c757d;
+}
+
+/* Toggle Switch Styles */
+.toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.toggle-label {
+  font-weight: 500;
+  color: #495057;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #d90429;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2b9348;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2b9348;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+/* ── DASH FOOTER ── */
+.dash-footer {
+  display: flex;
+  justify-content: center;
+  padding: 1.5rem 0 0.5rem;
+  border-top: 1px solid rgba(0,0,0,0.1);
+  margin-top: 2rem;
+  width: 100%;
+}
+.dash-footer__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0.45;
+  text-decoration: none;
+  transition: opacity 0.2s;
+  color: #6c757d;
+}
+.dash-footer__link:hover {
+  opacity: 0.85;
+  text-decoration: none;
+}
+.dash-footer__link span {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.dash-footer__logo {
+  height: 26px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* RESPONSIVE / MOBILE VIEW (Ej. Xiaomi Redmi Note 12) */
+@media (max-width: 768px) {
+  #root {
+    padding: 15px 10px;
+  }
+
+  .app-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .app-header p {
+    font-size: 1rem;
+  }
+
+  .app-main {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .controls-panel {
+    width: 100%;
+    min-width: 100%;
+    box-sizing: border-box;
+    padding: 20px 15px;
+  }
+
+  .preview-panel {
+    width: 100%;
+    min-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .preview-container {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    overflow-x: auto; /* Permite deslizar el flyer hacia los lados si no entra en la pantalla */
+    justify-content: flex-start;
+  }
+  
+  .actions {
+    flex-direction: column;
+  }
+  
+  .btn {
+    width: 100%;
+    padding: 15px; /* Botones más altos para tocar fácil con el dedo */
+  }
+}
