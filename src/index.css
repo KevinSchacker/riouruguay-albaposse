@@ -321,8 +321,14 @@ input:checked + .slider:before {
     width: 100%;
     box-sizing: border-box;
     padding: 10px;
-    overflow-x: auto; /* Permite deslizar el flyer hacia los lados si no entra en la pantalla */
-    justify-content: flex-start;
+    justify-content: center; /* Centrar de nuevo ya que no hay overflow */
+    overflow: hidden; /* Esconder partes si algo sobresale, pero con el scale no debería */
+  }
+  
+  .flyer-scale-wrapper {
+    transform: scale(0.65); /* Escala visual al 65% para que encaje en celulares de 360px (500 * 0.65 = 325px) */
+    transform-origin: top center;
+    margin-bottom: -310px; /* Compensa la altura vacía que deja el transform (888 * 0.35 aprox) */
   }
   
   .actions {

@@ -75,15 +75,26 @@ function App() {
   }, []);
 
   const handleDownload = async () => {
+    // 1. Quitar la escala visual para que html2canvas capture en tamaño real (500x888)
+    const scaleWrapper = document.getElementById('flyer-scale-wrapper');
+    if (scaleWrapper) {
+      scaleWrapper.style.transform = 'none';
+    }
+
     const flyerElement = document.getElementById('flyer-capture');
     if (!flyerElement) return;
 
     try {
       const canvas = await html2canvas(flyerElement, {
-        scale: 2,
+        scale: 2, // 500x888 * 2 = 1000x1776 (Resolución altísima para estados)
         useCORS: true,
         backgroundColor: '#002855'
       });
+      
+      // 2. Restaurar la escala visual
+      if (scaleWrapper) {
+        scaleWrapper.style.transform = '';
+      }
       
       const image = canvas.toDataURL('image/png');
       const link = document.createElement('a');
@@ -92,6 +103,8 @@ function App() {
       link.click();
     } catch (err) {
       console.error('Error al generar imagen:', err);
+      // Restaurar la escala incluso si hay error
+      if (scaleWrapper) scaleWrapper.style.transform = '';
       alert('Hubo un error al generar la imagen.');
     }
   };
@@ -212,7 +225,9 @@ function App() {
             {loading && !data && !manualMode ? (
               <div className="loading-state">Cargando datos del río...</div>
             ) : (
-              <FlyerPreview data={flyerData} ferryOperational={ferryOperational} />
+              <div id="flyer-scale-wrapper" className="flyer-scale-wrapper">
+                <FlyerPreview data={flyerData} ferryOperational={ferryOperational} />
+              </div>
             )}
           </div>
         </div>
