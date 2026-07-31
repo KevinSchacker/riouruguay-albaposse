@@ -2,7 +2,7 @@ import React from 'react';
 import { Calendar, Anchor, Info, TrendingUp, TrendingDown, Minus, MapPin } from 'lucide-react';
 import './FlyerPreview.css';
 
-const FlyerPreview = ({ data, ferryOperational }) => {
+const FlyerPreview = ({ data, ferryOperational, trendOverride = 'auto' }) => {
   const defaultData = {
     current: { height: '0.00', date: 'DD/MM/YY', time: '0000' },
     previous: { height: '0.00', date: 'DD/MM/YY', time: '0000' }
@@ -12,18 +12,31 @@ const FlyerPreview = ({ data, ferryOperational }) => {
   const currentHeight = parseFloat(safeData.current.height);
   const previousHeight = parseFloat(safeData.previous.height);
 
+  let calculatedTrend = 'ESTACIONARIO';
+  if (currentHeight > previousHeight) {
+    calculatedTrend = 'CRECIENDO';
+  } else if (currentHeight < previousHeight) {
+    calculatedTrend = 'BAJANDO';
+  }
+
+  const effectiveTrend = (trendOverride && trendOverride !== 'auto') ? trendOverride : calculatedTrend;
+
   let trend = 'ESTACIONARIO';
   let TrendIcon = Minus;
   let trendColor = '#f5b041';
 
-  if (currentHeight > previousHeight) {
+  if (effectiveTrend === 'CRECIENDO') {
     trend = 'CRECIENDO';
     TrendIcon = TrendingUp;
     trendColor = '#e74c3c';
-  } else if (currentHeight < previousHeight) {
+  } else if (effectiveTrend === 'BAJANDO') {
     trend = 'BAJANDO';
     TrendIcon = TrendingDown;
     trendColor = '#2ecc71';
+  } else {
+    trend = 'ESTACIONARIO';
+    TrendIcon = Minus;
+    trendColor = '#f5b041';
   }
 
   const formatDateTime = (dateStr, timeStr) => {

@@ -10,6 +10,7 @@ function App() {
   const [error, setError] = useState(null);
   const [ferryOperational, setFerryOperational] = useState(false);
   const [manualMode, setManualMode] = useState(false);
+  const [manualTrend, setManualTrend] = useState('auto');
   
   // Estados para modo manual
   const [manualData, setManualData] = useState({
@@ -145,6 +146,76 @@ function App() {
           </div>
 
           <div className="control-group" style={{marginTop: '20px', borderTop: '1px solid #ddd', paddingTop: '20px'}}>
+            <h3>Tendencia del Río</h3>
+            <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginTop: '10px'}}>
+              <button
+                type="button"
+                onClick={() => setManualTrend('auto')}
+                style={{
+                  padding: '8px 10px',
+                  borderRadius: '6px',
+                  border: manualTrend === 'auto' ? '2px solid #002855' : '1px solid #ccc',
+                  background: manualTrend === 'auto' ? '#002855' : '#f8f9fa',
+                  color: manualTrend === 'auto' ? '#fff' : '#333',
+                  fontWeight: manualTrend === 'auto' ? 'bold' : 'normal',
+                  cursor: 'pointer',
+                  fontSize: '13px'
+                }}
+              >
+                Auto (Calculado)
+              </button>
+              <button
+                type="button"
+                onClick={() => setManualTrend('CRECIENDO')}
+                style={{
+                  padding: '8px 10px',
+                  borderRadius: '6px',
+                  border: manualTrend === 'CRECIENDO' ? '2px solid #e74c3c' : '1px solid #ccc',
+                  background: manualTrend === 'CRECIENDO' ? '#e74c3c' : '#f8f9fa',
+                  color: manualTrend === 'CRECIENDO' ? '#fff' : '#333',
+                  fontWeight: manualTrend === 'CRECIENDO' ? 'bold' : 'normal',
+                  cursor: 'pointer',
+                  fontSize: '13px'
+                }}
+              >
+                ⬆️ Creciendo
+              </button>
+              <button
+                type="button"
+                onClick={() => setManualTrend('BAJANDO')}
+                style={{
+                  padding: '8px 10px',
+                  borderRadius: '6px',
+                  border: manualTrend === 'BAJANDO' ? '2px solid #2ecc71' : '1px solid #ccc',
+                  background: manualTrend === 'BAJANDO' ? '#2ecc71' : '#f8f9fa',
+                  color: manualTrend === 'BAJANDO' ? '#fff' : '#333',
+                  fontWeight: manualTrend === 'BAJANDO' ? 'bold' : 'normal',
+                  cursor: 'pointer',
+                  fontSize: '13px'
+                }}
+              >
+                ⬇️ Bajando
+              </button>
+              <button
+                type="button"
+                onClick={() => setManualTrend('ESTACIONARIO')}
+                style={{
+                  padding: '8px 10px',
+                  borderRadius: '6px',
+                  border: manualTrend === 'ESTACIONARIO' ? '2px solid #f5b041' : '1px solid #ccc',
+                  background: manualTrend === 'ESTACIONARIO' ? '#f5b041' : '#f8f9fa',
+                  color: manualTrend === 'ESTACIONARIO' ? '#fff' : '#333',
+                  fontWeight: manualTrend === 'ESTACIONARIO' ? 'bold' : 'normal',
+                  cursor: 'pointer',
+                  fontSize: '13px'
+                }}
+              >
+                ➖ Estacionario
+              </button>
+            </div>
+          </div>
+
+          <div className="control-group" style={{marginTop: '20px', borderTop: '1px solid #ddd', paddingTop: '20px'}}>
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px'}}>
               <h3 style={{margin: 0}}>Ingreso Manual</h3>
               <label className="switch">
@@ -226,7 +297,7 @@ function App() {
               <div className="loading-state">Cargando datos del río...</div>
             ) : (
               <div id="flyer-scale-wrapper" className="flyer-scale-wrapper">
-                <FlyerPreview data={flyerData} ferryOperational={ferryOperational} />
+                <FlyerPreview data={flyerData} ferryOperational={ferryOperational} trendOverride={manualTrend} />
               </div>
             )}
           </div>
