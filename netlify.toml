@@ -2,3 +2,10 @@
   command = "npm run build"
   publish = "dist"
   functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/prefectura"
+  to = "https://contenidosweb.prefecturanaval.gob.ar/alturas/?page=historico&tiempo=7&id=532"
+  status = 200
+  force = true
+

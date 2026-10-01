@@ -26,29 +26,59 @@ function App() {
     setLoading(true);
     setError(null);
     try {
-      // proxy.cors.sh comprobó poder saltar el agresivo firewall de Prefectura
-      const url = 'https://proxy.cors.sh/https://contenidosweb.prefecturanaval.gob.ar/alturas/?page=historico&tiempo=7&id=532';
-      
-      const response = await fetch(url, {
-        headers: {
-          'Accept': 'text/html,application/xhtml+xml,application/xml'
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Error de conexión.');
-      }
-      
-      const html = await response.text();
-      
-      const currentMatch = html.match(/ltimo registro: <\/b>([0-9.]+) Mts el (.*?) - ([0-9]+)/);
-      const previousMatch = html.match(/Registro anterior: <\/b>([0-9.]+) Mts el (.*?) - ([0-9]+)/);
+      let currentMatch = null;
+      let previousMatch = null;
+      let fetchedSuccessfully = false;
 
-      if (!currentMatch || !previousMatch) {
+      // 1. Intentar a través del proxy configurado (/api/prefectura)
+      try {
+        const response = await fetch('/api/prefectura', {
+          headers: {
+            'Accept': 'text/html,application/xhtml+xml,application/xml'
+          }
+        });
+        if (response.ok) {
+          const html = await response.text();
+          currentMatch = html.match(/ltimo registro: <\/b>([0-9.]+) Mts el (.*?) - ([0-9]+)/);
+          previousMatch = html.match(/Registro anterior: <\/b>([0-9.]+) Mts el (.*?) - ([0-9]+)/);
+          if (currentMatch && previousMatch) {
+            fetchedSuccessfully = true;
+          }
+        }
+      } catch (proxyErr) {
+        console.warn('Fallo en proxy /api/prefectura, probando función Netlify...', proxyErr);
+      }
+
+      // 2. Si el proxy falló, intentar función Netlify como respaldo
+      if (!fetchedSuccessfully) {
+        try {
+          const fnRes = await fetch('/.netlify/functions/getRiverData');
+          if (fnRes.ok) {
+            const json = await fnRes.json();
+            if (json && json.current && json.previous) {
+              setData(json);
+              setManualData({
+                currentHeight: json.current.height,
+                currentDate: json.current.date,
+                currentTime: json.current.time,
+                prevHeight: json.previous.height,
+                prevDate: json.previous.date,
+                prevTime: json.previous.time
+              });
+              setManualMode(false);
+              return;
+            }
+          }
+        } catch (fnErr) {
+          console.warn('Fallo en función Netlify', fnErr);
+        }
+      }
+
+      if (!fetchedSuccessfully || !currentMatch || !previousMatch) {
         throw new Error('No se pudo leer el formato.');
       }
       
-      setData({
+      const freshData = {
         current: {
           height: currentMatch[1],
           date: currentMatch[2],
@@ -61,7 +91,18 @@ function App() {
         },
         fetchedAt: new Date().toISOString(),
         isFallbackData: false
+      };
+
+      setData(freshData);
+      setManualData({
+        currentHeight: freshData.current.height,
+        currentDate: freshData.current.date,
+        currentTime: freshData.current.time,
+        prevHeight: freshData.previous.height,
+        prevDate: freshData.previous.date,
+        prevTime: freshData.previous.time
       });
+      setManualMode(false);
     } catch (err) {
       console.warn(err);
       setError('El servidor de Prefectura bloqueó la conexión automática.');
@@ -140,7 +181,7 @@ function App() {
                 <span className="slider round"></span>
               </label>
               <span className="toggle-label">
-                {ferryOperational ? 'Operativo (Habilitado)' : 'Sin Operatividad (Suspendido)'}
+                {ferryOperational ? 'Operatividad Habilitada' : 'Operatividad Suspendida'}
               </span>
             </div>
           </div>

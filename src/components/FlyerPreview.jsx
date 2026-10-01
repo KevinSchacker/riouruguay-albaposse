@@ -142,9 +142,8 @@ const FlyerPreview = ({ data, ferryOperational, trendOverride = 'auto' }) => {
               </svg>
             </div>
             <div className="alert-text">
-              <span className="alert-subtitle">AÚN SE MANTIENE</span>
-              <span className="alert-title">SIN OPERATIVIDAD</span>
-              <span className="alert-subtitle">EL SERVICIO DE BALSAS</span>
+              <span className="alert-subtitle">LA OPERATIVIDAD DEL PUERTO ALBA POSSE</span>
+              <span className="alert-title">SE ENCUENTRA SUSPENDIDA</span>
             </div>
           </div>
         )}
@@ -152,8 +151,8 @@ const FlyerPreview = ({ data, ferryOperational, trendOverride = 'auto' }) => {
         {ferryOperational && (
           <div className="ferry-status-alert operational">
             <div className="alert-text">
-              <span className="alert-subtitle">SERVICIO DE BALSAS</span>
-              <span className="alert-title" style={{color: 'white'}}>OPERATIVO</span>
+              <span className="alert-subtitle">LA OPERATIVIDAD DEL PUERTO ALBA POSSE</span>
+              <span className="alert-title" style={{color: 'white'}}>SE ENCUENTRA HABILITADA</span>
             </div>
           </div>
         )}
