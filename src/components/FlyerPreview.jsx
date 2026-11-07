@@ -96,11 +96,17 @@ const FlyerPreview = ({ data, ferryOperational, trendOverride = 'auto' }) => {
               </div>
             </div>
             <div className="height-value">
-              <span className="number">{safeData.previous.height.replace('.', ',')}</span>
-              <span className="unit">mts.</span>
+              <div className="height-content">
+                <span className="unit-spacer" aria-hidden="true">mts.</span>
+                <span className="number">{safeData.previous.height.replace('.', ',')}</span>
+                <span className="unit">mts.</span>
+              </div>
             </div>
-            <div className="trend-status neutral">
-              <span>REGISTRO ANTERIOR</span>
+            <div className="trend-container">
+              <div className="trend-status neutral">
+                <span>REGISTRO ANTERIOR</span>
+              </div>
+              <span className="trend-subtext spacer" aria-hidden="true">&nbsp;</span>
             </div>
           </div>
 
@@ -116,12 +122,18 @@ const FlyerPreview = ({ data, ferryOperational, trendOverride = 'auto' }) => {
               </div>
             </div>
             <div className="height-value">
-              <span className="number" style={{color: '#bdfa29'}}>{safeData.current.height.replace('.', ',')}</span>
-              <span className="unit">mts.</span>
+              <div className="height-content">
+                <span className="unit-spacer" aria-hidden="true">mts.</span>
+                <span className="number" style={{color: '#bdfa29'}}>{safeData.current.height.replace('.', ',')}</span>
+                <span className="unit">mts.</span>
+              </div>
             </div>
-            <div className="trend-status active" style={{color: trendColor}}>
-              <span>{trend}</span>
-              <TrendIcon size={22} />
+            <div className="trend-container">
+              <div className="trend-status active" style={{color: trendColor}}>
+                <span>{trend}</span>
+                <TrendIcon size={20} />
+              </div>
+              <span className="trend-subtext">AL MOMENTO DE LA ACTUALIZACIÓN</span>
             </div>
           </div>
 

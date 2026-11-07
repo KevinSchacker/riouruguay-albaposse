@@ -1,10 +1,35 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import cssInjectedByJsPlugin from 'vite-plugin-css-injected-by-js'
+import { resolve } from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), cssInjectedByJsPlugin()],
+  plugins: [
+    react(), 
+    // relativeCSSInjection: cada página (flyer y /app) inyecta solo su propio CSS
+    cssInjectedByJsPlugin({ relativeCSSInjection: true }),
+    // Permite acceder a /app en desarrollo y servir app.html automáticamente
+    {
+      name: 'rewrite-app-path',
+      configureServer(server) {
+        server.middlewares.use((req, res, next) => {
+          if (req.url === '/app' || req.url === '/app/') {
+            req.url = '/app.html';
+          }
+          next();
+        });
+      }
+    }
+  ],
+  build: {
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'index.html'),
+        app: resolve(__dirname, 'app.html')
+      }
+    }
+  },
   server: {
     proxy: {
       '/api/prefectura': {

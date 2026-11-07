@@ -1,0 +1,25 @@
+{
+  "name": "Estado del Río Uruguay - Alba Posse",
+  "short_name": "Río Alba Posse",
+  "description": "Monitoreo en tiempo real del nivel del Río Uruguay y estado del cruce de balsa en Puerto Alba Posse.",
+  "start_url": "/app",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#050d1f",
+  "theme_color": "#050d1f",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/FullBot.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/FullBot.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
