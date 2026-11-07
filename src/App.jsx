@@ -353,7 +353,7 @@ function App() {
           rel="noopener noreferrer"
           className="dash-footer__link"
         >
-          <span>Powered by</span>
+          
           <img
             src="https://www.fullpc.com.ar/favicom.png"
             alt="FullPC"
