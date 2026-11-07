@@ -1,4 +1,4 @@
-﻿import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   TrendingUp,
   TrendingDown,
@@ -635,7 +635,7 @@ const RiverPwaApp = () => {
             rel="noopener noreferrer"
             className="pwa-footer__link"
           >
-            <span>Powered by</span>
+            
             <img
               src="https://www.fullpc.com.ar/favicom.png"
               alt="FullPC"
