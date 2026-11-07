@@ -8,13 +8,13 @@ import {
   Waves,
   LifeBuoy,
   MapPin,
-  AlertTriangle,
   CheckCircle2,
   ShieldAlert,
   Share2,
   Phone,
   ChevronRight,
   WifiOff,
+  ServerOff,
   Clock,
   ExternalLink,
   Download,
@@ -24,73 +24,103 @@ import {
 import './RiverPwaApp.css';
 
 /* ============================================================
-   CONFIGURACIÓN
+   PARÁMETROS REALES ESTACIÓN ALBA POSSE (PNA ID 532)
    ============================================================ */
-const CACHE_KEY = 'rio-albaposse:last-data';
-const MAX_LEVEL = 12;          // Tope visual del medidor (metros)
-const FERRY_LIMIT = 8;         // Cota a partir de la cual la balsa posiblemente se suspende
-const WARNING_LEVEL = 7.6;     // Zona de precaución previa a la cota
+const FERRY_LIMIT = 8;         // > 8,00 m corta la balsa (coincide con Alerta PNA: 8.00 Mts)
+const MAX_LEVEL = 12;          // Evacuación oficial PNA: 12.00 Mts
+const FETCH_TIMEOUT_MS = 12000;
 const AUTO_REFRESH_MS = 10 * 60 * 1000;
 const PREFECTURA_URL = 'https://contenidosweb.prefecturanaval.gob.ar/alturas/?page=historico&tiempo=7&id=532';
 
 /* ============================================================
-   HELPERS
+   CONSULTA EN VIVO Y DIAGNÓSTICO DE CONEXIÓN (INTERNET vs PNA)
    ============================================================ */
 const parsePrefecturaHtml = (html) => {
-  const current = html.match(/ltimo registro: <\/b>([0-9.]+) Mts el (.*?) - ([0-9]+)/);
-  const previous = html.match(/Registro anterior: <\/b>([0-9.]+) Mts el (.*?) - ([0-9]+)/);
+  const current = html.match(/ltimo registro:\s*<\/b>\s*([0-9]+(?:\.[0-9]+)?)\s*Mts\s+el\s+(.*?)\s*-\s*([0-9]+)/i);
+  const previous = html.match(/Registro anterior:\s*<\/b>\s*([0-9]+(?:\.[0-9]+)?)\s*Mts\s+el\s+(.*?)\s*-\s*([0-9]+)/i);
   if (!current || !previous) return null;
+
+  const currVal = parseFloat(current[1]);
+  const prevVal = parseFloat(previous[1]);
+  if (!Number.isFinite(currVal) || !Number.isFinite(prevVal)) return null;
+
   return {
-    current: { height: current[1], date: current[2], time: current[3] },
-    previous: { height: previous[1], date: previous[2], time: previous[3] }
+    current: { height: current[1], date: current[2].trim(), time: current[3].trim() },
+    previous: { height: previous[1], date: previous[2].trim(), time: previous[3].trim() }
   };
 };
 
-const fetchRiverData = async () => {
-  // 1. Proxy (Vite en desarrollo / redirect de Netlify en producción)
+const fetchWithTimeout = async (url, options = {}) => {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
-    const res = await fetch('/api/prefectura', {
+    return await fetch(url, { ...options, cache: 'no-store', signal: controller.signal });
+  } finally {
+    clearTimeout(timer);
+  }
+};
+
+// Verifica si el dispositivo tiene salida a la red o si lo caído es únicamente PNA
+const hasDeviceInternet = async () => {
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) return false;
+  try {
+    const res = await fetchWithTimeout(`/manifest.json?ping=${Date.now()}`, { method: 'GET' });
+    return res.ok;
+  } catch {
+    return false;
+  }
+};
+
+const fetchLiveRiverData = async () => {
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+    const err = new Error('Sin conexión a internet.');
+    err.kind = 'offline';
+    throw err;
+  }
+
+  let networkThrow = false;
+
+  // 1. Proxy directo hacia PNA (Vite en local / Redirect en Netlify)
+  try {
+    const res = await fetchWithTimeout('/api/prefectura', {
       headers: { Accept: 'text/html,application/xhtml+xml,application/xml' }
     });
     if (res.ok) {
       const parsed = parsePrefecturaHtml(await res.text());
       if (parsed) return parsed;
     }
-  } catch (err) {
-    console.warn('Fallo en proxy /api/prefectura:', err);
+  } catch {
+    networkThrow = true;
   }
 
-  // 2. Respaldo: función Netlify
+  // 2. Respaldo: función serverless Netlify consultando PNA en tiempo real
   try {
-    const res = await fetch('/.netlify/functions/getRiverData');
+    const res = await fetchWithTimeout('/.netlify/functions/getRiverData');
     if (res.ok) {
       const json = await res.json();
-      if (json?.current && json?.previous) {
+      const currVal = parseFloat(json?.current?.height);
+      const prevVal = parseFloat(json?.previous?.height);
+      if (Number.isFinite(currVal) && Number.isFinite(prevVal)) {
         return { current: json.current, previous: json.previous };
       }
     }
-  } catch (err) {
-    console.warn('Fallo en función Netlify:', err);
-  }
-
-  throw new Error('No se pudo obtener la información de Prefectura.');
-};
-
-const readCache = () => {
-  try {
-    const raw = localStorage.getItem(CACHE_KEY);
-    return raw ? JSON.parse(raw) : null;
   } catch {
-    return null;
+    networkThrow = true;
   }
-};
 
-const writeCache = (payload) => {
-  try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify(payload));
-  } catch {
-    /* almacenamiento no disponible: se ignora */
+  // Distinguir con precisión si el celular quedó sin internet o si cayó PNA
+  if (networkThrow) {
+    const online = await hasDeviceInternet();
+    if (!online) {
+      const err = new Error('Sin conexión a internet.');
+      err.kind = 'offline';
+      throw err;
+    }
   }
+
+  const err = new Error('Se perdió la conexión con Prefectura Naval Argentina (PNA).');
+  err.kind = 'pna';
+  throw err;
 };
 
 const fmtNum = (n) => (Number.isFinite(n) ? n.toFixed(2).replace('.', ',') : '--');
@@ -113,36 +143,25 @@ const getTrend = (current, previous) => {
   return { key: 'flat', label: 'Estacionario', Icon: Minus, color: '#fbbf24' };
 };
 
-// Regla: < 8 m habilitada; acercándose a 8 m precaución; ≥ 8 m POSIBLE suspensión (no se asegura).
+// Regla oficial solicitada: > 8 mts corta la balsa; ≤ 8 mts habilitada.
 const getFerryStatus = (h) => {
-  if (h >= FERRY_LIMIT) {
+  if (h > FERRY_LIMIT) {
     return {
       key: 'stop',
-      label: 'Posible suspensión',
-      title: 'Posible suspensión',
-      short: `El río superó los ${FERRY_LIMIT} m`,
-      description: `Con el río por encima de los ${FERRY_LIMIT} metros, el servicio de balsa posiblemente se encuentre suspendido. Confirmá el estado con Prefectura Naval antes de trasladarte.`,
+      label: 'Balsa cortada (> 8 m)',
+      title: 'Servicio de balsa cortado',
+      short: `El río supera los ${FERRY_LIMIT},00 m`,
+      description: `La altura actual supera la cota de ${FERRY_LIMIT},00 metros. Con más de ${FERRY_LIMIT} metros se corta el servicio de balsa entre Alba Posse y Porto Mauá.`,
       color: '#f87171',
       Icon: ShieldAlert
     };
   }
-  if (h >= WARNING_LEVEL) {
-    return {
-      key: 'warn',
-      label: 'Habilitada · Precaución',
-      title: 'Habilitada con precaución',
-      short: `El río se acerca a los ${FERRY_LIMIT} m`,
-      description: `El nivel se está acercando a los ${FERRY_LIMIT} metros. Si continúa creciendo, el servicio de balsa podría suspenderse. Recomendamos consultar antes de viajar.`,
-      color: '#fbbf24',
-      Icon: AlertTriangle
-    };
-  }
   return {
     key: 'ok',
-    label: 'Habilitada',
+    label: 'Balsa habilitada (≤ 8 m)',
     title: 'Balsa habilitada',
-    short: 'Opera con normalidad',
-    description: `El río se encuentra por debajo de los ${FERRY_LIMIT} metros. En estas condiciones la balsa Alba Posse – Porto Mauá habitualmente opera con normalidad.`,
+    short: `Por debajo del corte (> ${FERRY_LIMIT} m)`,
+    description: `El río no supera los ${FERRY_LIMIT},00 metros. El servicio de balsa se corta únicamente cuando el nivel supera los ${FERRY_LIMIT} metros.`,
     color: '#4ade80',
     Icon: CheckCircle2
   };
@@ -211,14 +230,15 @@ const RiverGauge = ({ level, color }) => {
 };
 
 /* ============================================================
-   APP (SIN SCROLL — 100dvh)
+   APP (VALORES 100% REALES EN VIVO · SIN SCROLL)
    ============================================================ */
 const RiverPwaApp = () => {
-  const cached = readCache();
-  const [data, setData] = useState(cached);
-  const [fromCache, setFromCache] = useState(Boolean(cached));
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  // connIssue: null | 'offline' | 'pna'
+  const [connIssue, setConnIssue] = useState(() =>
+    typeof navigator !== 'undefined' && navigator.onLine === false ? 'offline' : null
+  );
   const [tab, setTab] = useState(() => {
     const hash = window.location.hash.replace('#', '');
     return ['rio', 'balsa', 'info'].includes(hash) ? hash : 'rio';
@@ -227,6 +247,15 @@ const RiverPwaApp = () => {
   const [now, setNow] = useState(Date.now());
   const [installEvent, setInstallEvent] = useState(null);
 
+  // Limpiar cualquier caché antiguo de versiones previas para no mostrar nunca datos viejos
+  useEffect(() => {
+    try {
+      localStorage.removeItem('rio-albaposse:last-data');
+    } catch {
+      /* ignorar */
+    }
+  }, []);
+
   const showToast = useCallback((msg) => {
     setToast(msg);
     setTimeout(() => setToast(null), 2600);
@@ -234,22 +263,19 @@ const RiverPwaApp = () => {
 
   const loadData = useCallback(async () => {
     setLoading(true);
-    setError(null);
     try {
-      const fresh = await fetchRiverData();
-      const payload = { ...fresh, syncedAt: new Date().toISOString() };
-      setData(payload);
-      setFromCache(false);
-      writeCache(payload);
+      const fresh = await fetchLiveRiverData();
+      setData({ ...fresh, syncedAt: new Date().toISOString() });
+      setConnIssue(null);
     } catch (err) {
-      console.warn(err);
-      setError(err.message);
+      setData(null);
+      setConnIssue(err?.kind === 'offline' ? 'offline' : 'pna');
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Carga inicial + refresco automático
+  // Carga inicial + refresco automático cada 10 min
   useEffect(() => {
     loadData();
     const id = setInterval(() => {
@@ -258,7 +284,22 @@ const RiverPwaApp = () => {
     return () => clearInterval(id);
   }, [loadData]);
 
-  // Reloj para los textos relativos ("hace X min")
+  // Detección inmediata de corte o regreso de internet en el celular
+  useEffect(() => {
+    const onOffline = () => {
+      setData(null);
+      setConnIssue('offline');
+    };
+    const onOnline = () => loadData();
+    window.addEventListener('offline', onOffline);
+    window.addEventListener('online', onOnline);
+    return () => {
+      window.removeEventListener('offline', onOffline);
+      window.removeEventListener('online', onOnline);
+    };
+  }, [loadData]);
+
+  // Reloj para textos relativos ("hace X min")
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 30000);
     return () => clearInterval(id);
@@ -294,12 +335,12 @@ const RiverPwaApp = () => {
     window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone;
 
   const handleShare = async () => {
-    if (!data) return;
+    if (!data || connIssue) return;
     const text =
       `🌊 Río Uruguay – Puerto Alba Posse\n` +
-      `Nivel: ${fmtNum(currentHeight)} m (${trend.label.toLowerCase()})\n` +
+      `Nivel PNA: ${fmtNum(currentHeight)} m (${trend.label.toLowerCase()})\n` +
       `Balsa: ${ferry.label}\n` +
-      `Registro: ${fmtTime(data.current.time)} hs · ${fmtDate(data.current.date)}`;
+      `Registro oficial: ${fmtTime(data.current.time)} hs · ${fmtDate(data.current.date)}`;
 
     if (navigator.share) {
       try {
@@ -325,14 +366,16 @@ const RiverPwaApp = () => {
   };
 
   const syncLabel = loading
-    ? 'Actualizando…'
-    : error
-      ? `Sin conexión${data ? ` · ${fmtRelative(data.syncedAt, now)}` : ''}`
-      : data
-        ? `${fromCache ? 'Guardado' : 'Actualizado'} ${fmtRelative(data.syncedAt, now)}`
-        : 'Conectando…';
+    ? 'Consultando PNA…'
+    : connIssue === 'offline'
+      ? 'Sin conexión a internet'
+      : connIssue === 'pna'
+        ? 'Sin conexión con PNA'
+        : data
+          ? `PNA en vivo · ${fmtRelative(data.syncedAt, now)}`
+          : 'Conectando…';
 
-  /* ---------- Vistas (ajustadas al alto disponible sin scroll) ---------- */
+  /* ---------- Vistas ---------- */
 
   const renderSkeleton = () => (
     <div className="pwa-view">
@@ -346,36 +389,64 @@ const RiverPwaApp = () => {
     </div>
   );
 
-  const renderError = () => (
-    <div className="pwa-view pwa-view--center">
-      <div className="pwa-empty">
-        <div className="pwa-empty__icon"><WifiOff size={28} /></div>
-        <h2>Sin datos disponibles</h2>
-        <p>No pudimos conectar con Prefectura Naval. Revisá tu conexión e intentá nuevamente.</p>
-        <button className="pwa-btn pwa-btn--primary" onClick={loadData} disabled={loading}>
-          <RefreshCw size={17} className={loading ? 'pwa-spin' : ''} />
-          Reintentar
-        </button>
+  const renderConnectionState = () => {
+    const isOffline = connIssue === 'offline';
+    const StateIcon = isOffline ? WifiOff : ServerOff;
+
+    return (
+      <div className="pwa-view pwa-view--center">
+        <div className={`pwa-empty ${isOffline ? 'is-offline' : 'is-pna'}`}>
+          <div className="pwa-empty__icon">
+            <StateIcon size={28} />
+          </div>
+          <span className="pwa-empty__badge">
+            {isOffline ? 'Red desconectada' : 'Servidor PNA no disponible'}
+          </span>
+          <h2>
+            {isOffline ? 'Sin conexión a internet' : 'Se perdió la conexión con PNA'}
+          </h2>
+          <p>
+            {isOffline
+              ? 'Tu celular no tiene acceso a internet en este momento. Conectate a una red Wi‑Fi o datos móviles para ver los valores reales del río.'
+              : 'Tenés conexión a internet, pero el sistema oficial de Prefectura Naval Argentina (PNA) no responde en este momento. No se muestran valores estimados.'}
+          </p>
+          <div className="pwa-empty__actions">
+            <button className="pwa-btn pwa-btn--primary" onClick={loadData} disabled={loading}>
+              <RefreshCw size={16} className={loading ? 'pwa-spin' : ''} />
+              {loading ? 'Verificando…' : 'Reintentar conexión'}
+            </button>
+            {!isOffline && (
+              <a
+                href={PREFECTURA_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="pwa-link"
+              >
+                Abrir web oficial de PNA <ExternalLink size={13} />
+              </a>
+            )}
+          </div>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderRio = () => (
     <div className="pwa-view">
-      {/* HERO FLEXIBLE: se adapta a cualquier alto de pantalla */}
+      {/* HERO FLEXIBLE: valores reales de PNA */}
       <section className="pwa-hero" style={{ '--status': ferry.color }}>
         <div className="pwa-hero__meta">
           <span className="pwa-chip">
             <Clock size={12} />
             {fmtTime(data.current.time)} hs · {fmtDate(data.current.date)}
           </span>
-          <span className="pwa-hero__source">Prefectura Naval</span>
+          <span className="pwa-hero__source">Prefectura Naval (PNA)</span>
         </div>
 
         <div className="pwa-hero__gauge">
           <RiverGauge level={currentHeight} color={ferry.color} />
           <div className="pwa-hero__reading">
-            <span className="pwa-hero__label">Altura actual</span>
+            <span className="pwa-hero__label">Altura real PNA</span>
             <span className="pwa-hero__value">{fmtNum(currentHeight)}</span>
             <span className="pwa-hero__unit">metros</span>
           </div>
@@ -413,7 +484,7 @@ const RiverPwaApp = () => {
         <ChevronRight size={18} className="pwa-ferry-summary__chev" />
       </button>
 
-      {/* 3 MÉTRICAS COMPACTAS EN UNA SOLA FILA */}
+      {/* 3 MÉTRICAS REALES EN UNA SOLA FILA */}
       <div className="pwa-grid-3">
         <div className="pwa-card pwa-tile">
           <span className="pwa-overline">Anterior</span>
@@ -425,14 +496,14 @@ const RiverPwaApp = () => {
           <span className="pwa-tile__value" style={{ color: trend.color }}>
             {diff > 0 ? '+' : ''}{fmtNum(diff)}<small> m</small>
           </span>
-          <span className="pwa-tile__sub">Entre lecturas</span>
+          <span className="pwa-tile__sub">Entre registros</span>
         </div>
         <div className="pwa-card pwa-tile">
           <span className="pwa-overline">Cota {FERRY_LIMIT} m</span>
           <span className="pwa-tile__value" style={{ color: ferry.color }}>
-            {margin >= 0 ? `+${fmtNum(margin)}` : fmtNum(Math.abs(margin))}<small> m</small>
+            {margin > 0 ? `+${fmtNum(margin)}` : fmtNum(Math.abs(margin))}<small> m</small>
           </span>
-          <span className="pwa-tile__sub">{margin >= 0 ? 'Sobre cota' : 'Bajo cota'}</span>
+          <span className="pwa-tile__sub">{margin > 0 ? 'Sobre cota' : 'Hasta el corte'}</span>
         </div>
       </div>
     </div>
@@ -449,7 +520,7 @@ const RiverPwaApp = () => {
         <p className="pwa-ferry__desc">{ferry.description}</p>
       </section>
 
-      {/* ESCALA DE UMBRALES */}
+      {/* ESCALA REAL PNA (SIN VALORES INTERMEDIOS INVENTADOS): ≤ 8 m vs > 8 m */}
       <section className="pwa-card pwa-card--compact">
         <div className="pwa-section-head">
           <span className="pwa-overline">Nivel respecto a la cota</span>
@@ -457,8 +528,7 @@ const RiverPwaApp = () => {
         </div>
         <div className="pwa-scale">
           <div className="pwa-scale__track">
-            <div className="pwa-scale__seg pwa-scale__seg--ok" style={{ width: `${(WARNING_LEVEL / MAX_LEVEL) * 100}%` }} />
-            <div className="pwa-scale__seg pwa-scale__seg--warn" style={{ width: `${((FERRY_LIMIT - WARNING_LEVEL) / MAX_LEVEL) * 100}%` }} />
+            <div className="pwa-scale__seg pwa-scale__seg--ok" style={{ width: `${(FERRY_LIMIT / MAX_LEVEL) * 100}%` }} />
             <div className="pwa-scale__seg pwa-scale__seg--stop" style={{ flex: 1 }} />
           </div>
           <div className="pwa-scale__marker" style={{ left: `${markerPct}%` }}>
@@ -467,15 +537,14 @@ const RiverPwaApp = () => {
           <div className="pwa-scale__labels">
             <span>0 m</span>
             <span style={{ left: `${(FERRY_LIMIT / MAX_LEVEL) * 100}%` }} className="pwa-scale__limit">
-              {FERRY_LIMIT} m
+              {FERRY_LIMIT},00 m (Corte)
             </span>
-            <span>{MAX_LEVEL} m</span>
+            <span>{MAX_LEVEL} m (Evac.)</span>
           </div>
         </div>
         <ul className="pwa-legend">
-          <li><i style={{ background: '#4ade80' }} />&lt; {fmtNum(WARNING_LEVEL)} m · Habilitada</li>
-          <li><i style={{ background: '#fbbf24' }} />{fmtNum(WARNING_LEVEL)}–{FERRY_LIMIT} m · Precaución</li>
-          <li><i style={{ background: '#f87171' }} />≥ {FERRY_LIMIT} m · Posible corte</li>
+          <li><i style={{ background: '#4ade80' }} />≤ {FERRY_LIMIT},00 m · Habilitada</li>
+          <li><i style={{ background: '#f87171' }} />&gt; {FERRY_LIMIT},00 m · Corta la balsa</li>
         </ul>
       </section>
 
@@ -499,7 +568,7 @@ const RiverPwaApp = () => {
         </div>
         <p className="pwa-disclaimer">
           <Info size={13} />
-          <span>Orientativo según altura. Confirmación oficial: Prefectura Naval.</span>
+          <span>Datos oficiales de Prefectura Naval Argentina (Estación Alba Posse).</span>
         </p>
       </section>
     </div>
@@ -551,11 +620,11 @@ const RiverPwaApp = () => {
       <section className="pwa-card pwa-card--compact">
         <span className="pwa-overline">Fuente oficial</span>
         <p className="pwa-text">
-          Alturas publicadas por Prefectura Naval Argentina (estación Alba Posse).
-          Actualización automática cada 10 minutos.
+          Valores obtenidos en tiempo real de Prefectura Naval Argentina (estación Alba Posse).
+          Cota de alerta y corte de balsa: &gt; 8,00 m · Evacuación: 12,00 m.
         </p>
         <a href={PREFECTURA_URL} target="_blank" rel="noopener noreferrer" className="pwa-link">
-          Ver publicación de Prefectura <ExternalLink size={14} />
+          Ver publicación oficial de PNA <ExternalLink size={14} />
         </a>
       </section>
 
@@ -570,9 +639,12 @@ const RiverPwaApp = () => {
   );
 
   const renderContent = () => {
-    if (!data) return loading || !error ? renderSkeleton() : renderError();
-    if (tab === 'balsa') return renderBalsa();
+    // En pestaña Ayuda siempre dejamos disponibles los teléfonos 106 y 103 incluso sin red
     if (tab === 'info') return renderInfo();
+    // Si hay corte de internet o caída de PNA, se informa explícitamente en vez de mostrar valores viejos o simulados
+    if (connIssue) return renderConnectionState();
+    if (!data) return renderSkeleton();
+    if (tab === 'balsa') return renderBalsa();
     return renderRio();
   };
 
@@ -590,16 +662,22 @@ const RiverPwaApp = () => {
           <img src="/logo-proteccion-final.png" alt="" className="pwa-topbar__logo" />
           <div className="pwa-topbar__titles">
             <span className="pwa-topbar__title">Río Uruguay</span>
-            <span className={`pwa-topbar__sub ${error ? 'is-error' : ''}`}>
+            <span className={`pwa-topbar__sub ${connIssue ? 'is-error' : ''}`}>
               <MapPin size={10} /> Alba Posse ·{' '}
-              {error ? <WifiOff size={10} /> : <i className={`pwa-sync-dot ${loading ? 'is-loading' : ''}`} />}
+              {connIssue === 'offline' ? (
+                <WifiOff size={10} />
+              ) : connIssue === 'pna' ? (
+                <ServerOff size={10} />
+              ) : (
+                <i className={`pwa-sync-dot ${loading ? 'is-loading' : ''}`} />
+              )}
               <span>{syncLabel}</span>
             </span>
           </div>
         </div>
 
         <div className="pwa-topbar__actions">
-          {data && (
+          {data && !connIssue && (
             <button
               className="pwa-icon-btn"
               onClick={handleShare}
@@ -635,7 +713,7 @@ const RiverPwaApp = () => {
             rel="noopener noreferrer"
             className="pwa-footer__link"
           >
-            
+            <span>Powered by</span>
             <img
               src="https://www.fullpc.com.ar/favicom.png"
               alt="FullPC"

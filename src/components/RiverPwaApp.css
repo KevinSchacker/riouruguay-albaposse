@@ -655,11 +655,11 @@ button {
   border-top: 1px solid var(--pwa-border);
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 6px 10px;
-  font-size: 11px;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.82);
+  justify-content: space-around;
+  gap: 8px 16px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.88);
 }
 
 .pwa-legend li {
@@ -906,36 +906,80 @@ button {
   font-weight: 600;
 }
 
-/* ── ESTADOS VACÍO / CARGA ── */
+/* ── ESTADOS DE CONEXIÓN (SIN INTERNET vs SIN PNA) / CARGA ── */
 .pwa-empty {
   text-align: center;
-  padding: 28px 20px;
-  border-radius: var(--pwa-radius);
+  padding: 26px 20px;
+  border-radius: 24px;
   background: var(--pwa-surface);
   border: 1px solid var(--pwa-border);
 }
 
+.pwa-empty.is-offline {
+  border-color: rgba(251, 191, 36, 0.32);
+  background: radial-gradient(110% 80% at 50% 0%, rgba(251, 191, 36, 0.14), transparent 70%), var(--pwa-surface);
+}
+
+.pwa-empty.is-pna {
+  border-color: rgba(248, 113, 113, 0.32);
+  background: radial-gradient(110% 80% at 50% 0%, rgba(248, 113, 113, 0.14), transparent 70%), var(--pwa-surface);
+}
+
 .pwa-empty__icon {
-  width: 54px;
-  height: 54px;
+  width: 56px;
+  height: 56px;
   margin: 0 auto 12px;
-  border-radius: 16px;
+  border-radius: 18px;
   display: grid;
   place-items: center;
-  background: rgba(251, 191, 36, 0.14);
+  background: rgba(251, 191, 36, 0.16);
   color: #fbbf24;
 }
 
+.pwa-empty.is-pna .pwa-empty__icon {
+  background: rgba(248, 113, 113, 0.16);
+  color: #f87171;
+}
+
+.pwa-empty__badge {
+  display: inline-block;
+  margin-bottom: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #fbbf24;
+  background: rgba(251, 191, 36, 0.14);
+  border: 1px solid rgba(251, 191, 36, 0.32);
+}
+
+.pwa-empty.is-pna .pwa-empty__badge {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.14);
+  border-color: rgba(248, 113, 113, 0.32);
+}
+
 .pwa-empty h2 {
-  margin: 0 0 6px;
-  font-size: 18px;
+  margin: 0 0 8px;
+  font-size: 19px;
+  font-weight: 800;
 }
 
 .pwa-empty p {
-  margin: 0 0 16px;
+  margin: 0 auto 18px;
+  max-width: 34ch;
   font-size: 13px;
-  line-height: 1.45;
+  line-height: 1.5;
   color: var(--pwa-muted);
+}
+
+.pwa-empty__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
 .pwa-skel {

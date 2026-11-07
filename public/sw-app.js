@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rio-albaposse-shell-v1';
+const CACHE_NAME = 'rio-albaposse-shell-v2';
 const PRECACHE_URLS = [
   '/app',
   '/manifest.json',
@@ -32,8 +32,9 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
 
   const url = new URL(request.url);
-  // No interceptar APIs en vivo ni módulos internos de desarrollo de Vite
+  // Nunca interceptar datos en vivo de PNA, verificaciones de red ni módulos de Vite
   if (
+    url.searchParams.has('ping') ||
     url.pathname.startsWith('/api/') ||
     url.pathname.startsWith('/.netlify/') ||
     url.pathname.startsWith('/@') ||
@@ -43,7 +44,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Estrategia Network-First con respaldo en caché para funcionar sin conexión
+  // Shell estático de la app: Network-First con respaldo en caché para abrir la interfaz offline
   event.respondWith(
     fetch(request)
       .then((response) => {
